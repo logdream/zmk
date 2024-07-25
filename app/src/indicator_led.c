@@ -16,6 +16,7 @@
 #include <zmk/activity.h>
 #include <zmk/indicator_led.h>
 #include <zmk/usb.h>
+#include <zmk/backlight.h>
 #include <zmk/event_manager.h>
 #include <zmk/events/activity_state_changed.h>
 #include <zmk/events/usb_conn_state_changed.h>
@@ -60,7 +61,7 @@ static struct indicator_led_blinky led_blinky = {
 static struct k_work_delayable polling_work;
 static struct k_work_delayable cycle_work;
 static struct k_work_delayable blinky_work;
-static struct indicator_led_state state = {
+static struct indicator_led_state LED_state = {
     .brightness = CONFIG_ZMK_IDICATOR_LAYER_BRT,
     .on = IS_ENABLED(CONFIG_ZMK_IDICATOR_ON_START),
     .cycle_state = false,
@@ -142,52 +143,52 @@ static int zmk_indicator_led_update_and_save() {
 }
 
 int zmk_indicator_led_on() {
-    state.brightness = MAX(state.brightness, CONFIG_ZMK_IDICATOR_BRT_STEP);
-    state.on = true;
+    LED_state.brightness = MAX(LED_state.brightness, CONFIG_ZMK_IDICATOR_BRT_STEP);
+    LED_state.on = true;
     return zmk_indicator_led_update_and_save();
 }
 
 int zmk_indicator_led_off() {
-    state.on = false;
+    LED_state.on = false;
     return zmk_indicator_led_update_and_save();
 }
 
 int zmk_indicator_led_toggle() {
-    return state.on ? zmk_indicator_led_off() : zmk_indicator_led_on();
+    return LED_state.on ? zmk_indicator_led_off() : zmk_indicator_led_on();
 }
 
-bool zmk_indicator_led_is_on() { return state.on; }
+bool zmk_indicator_led_is_on() { return LED_state.on; }
 
 int zmk_indicator_led_set_brt(uint8_t brightness) {
-    state.brightness = MIN(brightness, BRT_MAX);
-    state.on = (state.brightness > 0);
+    LED_state.brightness = MIN(brightness, BRT_MAX);
+    LED_state.on = (LED_state.brightness > 0);
     return zmk_indicator_led_update_and_save();
 }
 
-uint8_t zmk_indicator_led_get_brt() { return state.on ? state.brightness : 0; }
+uint8_t zmk_indicator_led_get_brt() { return LED_state.on ? LED_state.brightness : 0; }
 
 uint8_t zmk_indicator_led_calc_brt(int direction) {
-    int brt = state.brightness + (direction * CONFIG_ZMK_IDICATOR_BRT_STEP);
+    int brt = LED_state.brightness + (direction * CONFIG_ZMK_IDICATOR_BRT_STEP);
     return CLAMP(brt, CONFIG_ZMK_IDICATOR_LAYER_CYCLE_MINBRT,
                  CONFIG_ZMK_IDICATOR_LAYER_CYCLE_MAXBRT);
 }
 
 uint8_t zmk_indicator_led_calc_brt_cycle() {
-    if (state.brightness == BRT_MAX) {
+    if (LED_state.brightness == BRT_MAX) {
         return 0;
     } else {
         return zmk_indicator_led_calc_brt(1);
     }
 }
 static inline void cycle_schedule(void) {
-    if (state.cycle_state) {
+    if (LED_state.cycle_state) {
         k_work_reschedule(&cycle_work, K_MSEC(10));
         return;
     }
     k_work_cancel_delayable(&cycle_work);
 }
 static inline void blinky_schedule(void) {
-    if (state.blinky_state) {
+    if (LED_state.blinky_state) {
         k_work_reschedule(&blinky_work, K_MSEC(10));
         return;
     }
@@ -195,65 +196,60 @@ static inline void blinky_schedule(void) {
 }
 static inline void cycle_onoff(bool onoff) {
     if (onoff) {
-        if (!state.cycle_state) {
-            state.cycle_state = true;
+        if (!LED_state.cycle_state) {
+            LED_state.cycle_state = true;
             cycle_schedule();
         }
         return;
     }
-    if (state.cycle_state) {
-        state.cycle_state = false;
+    if (LED_state.cycle_state) {
+        LED_state.cycle_state = false;
         cycle_schedule();
     }
 }
 static inline void blinky_onoff(bool onoff) {
     if (onoff) {
-        if (!state.blinky_state) {
-            state.blinky_state = true;
+        if (!LED_state.blinky_state) {
+            LED_state.blinky_state = true;
             blinky_schedule();
         }
         return;
     }
-    if (state.blinky_state) {
-        state.blinky_state = false;
+    if (LED_state.blinky_state) {
+        LED_state.blinky_state = false;
         blinky_schedule();
     }
 }
 static void polling_work_work_handler(struct k_work *work) {
-    for (int i = 0; i < 4; i++) {
-        if (zmk_keymap_layer_active(i)) {
-            switch (i) {
-            case 0:
+        if (zmk_keymap_highest_layer_active()==0) {               
+                uint8_t current_backlight_brightness=zmk_backlight_get_brt();
+                if(current_backlight_brightness!=0){
+                zmk_indicator_led_set_brt(current_backlight_brightness);
+                zmk_indicator_led_on();
+                cycle_onoff(false);
+                blinky_onoff(false);
+                }
+                else if(current_backlight_brightness==0){
                 cycle_onoff(false);
                 zmk_indicator_led_off();
                 blinky_onoff(false);
-                break;
-            case 1:
-                cycle_onoff(false);
-                zmk_indicator_led_set_brt(CONFIG_ZMK_IDICATOR_LAYER_BRT);
+                } }
+         else if(zmk_keymap_highest_layer_active()==1){
+                if (!zmk_indicator_led_is_on())
                 zmk_indicator_led_on();
-                blinky_onoff(false);
-
-                break;
-            case 2:
-                if (!zmk_indicator_led_is_on())
-                    zmk_indicator_led_on();
-                cycle_onoff(true);
-                blinky_onoff(false);
-                break;
-            case 3:
-                if (!zmk_indicator_led_is_on())
-                    zmk_indicator_led_on();
                 cycle_onoff(false);
-                blinky_onoff(true);
-                break;
-
-            default:
-                break;
-            }
-        }
-    }
+                blinky_onoff(true);}
+        else if(zmk_keymap_highest_layer_active()==2){
+                if (!zmk_indicator_led_is_on())
+                zmk_indicator_led_on();
+                cycle_onoff(true);
+                blinky_onoff(false);}
+        else if(zmk_keymap_highest_layer_active()==3){
+                cycle_onoff(false);
+                zmk_indicator_led_off();
+                blinky_onoff(false);}
     k_work_reschedule(&polling_work, K_MSEC(100));
 }
 
 SYS_INIT(zmk_indicator_led_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
+
