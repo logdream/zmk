@@ -71,7 +71,8 @@ int main(void) {
             int8_t scroll_y = 0;
             if (zmk_hid_indicators_get_current_profile() == 2 ||
                 zmk_hid_indicators_get_current_profile() == 3 ||
-                zmk_hid_indicators_get_current_profile() == 7) {
+                zmk_hid_indicators_get_current_profile() == 7 ||
+                zmk_hid_indicators_get_current_profile() == 4) {
                 if (abs(y) >= 128) {
                     scroll_x = -x / 24;
                     scroll_y = -y / 24;
@@ -97,8 +98,10 @@ int main(void) {
                 x = 0;
                 y = 0;
             } else {
-                x = ((x < 127) ? x : (x - 256)) * 1.5 * CONFIG_TRACKPAD_SPEEDMULTIPLIER_HORIZONTAL/100;
-                y = ((y < 127) ? y : (y - 256)) * 1.5 * CONFIG_TRACKPAD_SPEEDMULTIPLIER_VERTICAL/100;
+                x = ((x < 127) ? x : (x - 256)) * 1.5 * CONFIG_TRACKPAD_SPEEDMULTIPLIER_HORIZONTAL /
+                    100;
+                y = ((y < 127) ? y : (y - 256)) * 1.5 * CONFIG_TRACKPAD_SPEEDMULTIPLIER_VERTICAL /
+                    100;
             }
             zmk_hid_mouse_movement_set(0, 0);
             zmk_hid_mouse_movement_update(x, y);
@@ -116,7 +119,8 @@ int main(void) {
             int8_t scroll_y = 0;
             if (zmk_hid_indicators_get_current_profile() == 2 ||
                 zmk_hid_indicators_get_current_profile() == 3 ||
-                zmk_hid_indicators_get_current_profile() == 7) {
+                zmk_hid_indicators_get_current_profile() == 7 ||
+                zmk_hid_indicators_get_current_profile() == 4) {
                 if (abs(y) >= 128) {
                     scroll_x = -x / 24;
                     scroll_y = -y / 24;
@@ -142,8 +146,10 @@ int main(void) {
                 x = 0;
                 y = 0;
             } else {
-                x = ((x < 127) ? x : (x - 256)) * 1.5 * CONFIG_TRACKPAD_SPEEDMULTIPLIER_HORIZONTAL/100;
-                y = ((y < 127) ? y : (y - 256)) * 1.5 * CONFIG_TRACKPAD_SPEEDMULTIPLIER_VERTICAL/100;
+                x = ((x < 127) ? x : (x - 256)) * 1.5 * CONFIG_TRACKPAD_SPEEDMULTIPLIER_HORIZONTAL /
+                    100;
+                y = ((y < 127) ? y : (y - 256)) * 1.5 * CONFIG_TRACKPAD_SPEEDMULTIPLIER_VERTICAL /
+                    100;
             }
             zmk_hid_mouse_movement_set(0, 0);
             zmk_hid_mouse_movement_update(x, y);
@@ -158,7 +164,8 @@ int main(void) {
             int8_t scroll_y = 0;
             if (zmk_hid_indicators_get_current_profile() == 2 ||
                 zmk_hid_indicators_get_current_profile() == 3 ||
-                zmk_hid_indicators_get_current_profile() == 7) {
+                zmk_hid_indicators_get_current_profile() == 7 ||
+                zmk_hid_indicators_get_current_profile() == 4) {
                 if (abs(y) >= 128) {
                     scroll_x = -x / 24;
                     scroll_y = -y / 24;
@@ -184,8 +191,10 @@ int main(void) {
                 x = 0;
                 y = 0;
             } else {
-                x = ((x < 127) ? x : (x - 256)) * 1.5 * CONFIG_TRACKPAD_SPEEDMULTIPLIER_HORIZONTAL/100;
-                y = ((y < 127) ? y : (y - 256)) * 1.5 * CONFIG_TRACKPAD_SPEEDMULTIPLIER_VERTICAL/100;
+                x = ((x < 127) ? x : (x - 256)) * 1.5 * CONFIG_TRACKPAD_SPEEDMULTIPLIER_HORIZONTAL /
+                    100;
+                y = ((y < 127) ? y : (y - 256)) * 1.5 * CONFIG_TRACKPAD_SPEEDMULTIPLIER_VERTICAL /
+                    100;
             }
             zmk_hid_mouse_movement_set(0, 0);
             zmk_hid_mouse_movement_update(x, y);

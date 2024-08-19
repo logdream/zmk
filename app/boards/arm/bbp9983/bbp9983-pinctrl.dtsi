@@ -21,13 +21,13 @@
 
     pwm0_default: pwm0_default {
         group1 {
-            psels = <NRF_PSEL(PWM_OUT0, 1, 9)>; // Backlight for Layerindicator
+            psels = <NRF_PSEL(PWM_OUT0, 1, 4)>; // Backlight for Layerindicator
         };
     };
 
     pwm0_sleep: pwm0_sleep {
         group1 {
-            psels = <NRF_PSEL(PWM_OUT0, 1, 9)>;
+            psels = <NRF_PSEL(PWM_OUT0, 1, 4)>;
             bias-pull-down;
         };
     };
