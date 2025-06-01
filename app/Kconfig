@@ -44,7 +44,7 @@ if SOC_SERIES_NRF52X
 # Default on for our usage until boards implement retained bootmode.
 config NRF_STORE_REBOOT_TYPE_GPREGRET
     bool
-    default y
+    default n
 
 endif # SOC_SERIES_NRF52X
 
@@ -361,6 +361,81 @@ config ZMK_BACKLIGHT_AUTO_OFF_USB
     bool "Turn off backlight when USB is disconnected"
 
 endif # ZMK_BACKLIGHT
+
+menuconfig ZMK_INDICATOR_LED
+    bool "LED indicator"
+
+if ZMK_INDICATOR_LED
+
+config ZMK_IDICATOR_LAYER_BRT
+    int "Default Brightness On Start"
+    range 1 100
+    default 20
+
+config ZMK_IDICATOR_LAYER_CYCLE_MAXBRT
+    int "Brightness Cycle Max Brightness"
+    range 1 100
+    default 40
+
+config ZMK_IDICATOR_LAYER_CYCLE_MINBRT
+    int "Brightness Cycle Min Brightness"
+    range 1 100
+    default 40
+
+config ZMK_IDICATOR_LAYER_CYCLE_INTERVAL
+    int "Brightness Cycle Interval time in ms"
+    default 1000
+
+config ZMK_IDICATOR_BRT_STEP
+    int "Brightness Change For Single Step"
+    range 1 100
+    default 30
+
+config ZMK_IDICATOR_BLINK_INTERVAL
+    int "BLINK INTERVAL for INDICATOR LAYER 4"
+    default 300
+
+#ZMK_INDICATOR_LED
+endif
+
+menuconfig ZMK_INDICATOR_CAPSLOCK
+    bool "LED indicator_capslock"
+
+if ZMK_INDICATOR_CAPSLOCK
+
+config ZMK_INDICATOR_CAPSLOCK_BRT
+    int "Default Brightness On Start"
+    range 1 100
+    default 20
+
+#ZMK_INDICATOR_CAPSLOCK
+endif
+
+menuconfig INPUT_A320
+    bool "A320 touchpad Driver"
+    depends on I2C
+    help
+      Enable driver for A320
+config INPUT_A320_POLLINGRATE
+	int "POLLING RATE"
+	default 400
+	help
+	  set the polling rate of a320
+
+config TRACKPAD_SCROLL_INTERVAL
+    int "Trackpad scroll interval"
+    range 10 500
+    default 20
+
+config TRACKPAD_SPEEDMULTIPLIER_HORIZONTAL
+    int "trackpad speed multiplier in horizontal direction"
+    range 0 1000
+    default 100
+
+config TRACKPAD_SPEEDMULTIPLIER_VERTICAL
+    int "trackpad speed multiplier in horizontal direction"
+    range 0 10000
+    default 100
 
 endmenu # Display/LED Options
 
